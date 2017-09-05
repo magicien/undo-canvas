@@ -8,7 +8,7 @@
     const numLines = 100000
 
     document.addEventListener('DOMContentLoaded', () => {
-      const c = document.getElementById('hoge')
+      const c = document.getElementById('undoCanvas')
       const context = c.getContext('2d')
       const width = c.width
       const height = c.height
@@ -68,7 +68,7 @@
 <body>
   <h2>Undo/Redo 100,000 line strokes</h2>
   <div style="width: 300px; padding: 0 20px; margin: 0; text-align: center;">
-    <canvas id="hoge" width="300" height="300"></canvas><br />
+    <canvas id="undoCanvas" width="300" height="300"></canvas><br />
     <button id="undoButton">Undo</button>
     <input id="historyNo" type="text" disabled style="width: 70px; text-align: right"/>
     <button id="redoButton">Redo</button><br />
