@@ -1,6 +1,6 @@
 {
   "name": "undo-canvas",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Adds undo/redo functions to CanvasRenderingContext2D",
   "main": "index.js",
   "scripts": {
