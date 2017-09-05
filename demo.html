@@ -1,0 +1,73 @@
+<html>
+<head>
+  <meta charset="utf8">
+  <title>undo-canvas demo</title>
+  <script src="undo-canvas.js"></script>
+  <script>
+    const numLines = 100000
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const c = document.getElementById('hoge')
+      const context = c.getContext('2d')
+      const width = c.width
+      const height = c.height
+      UndoCanvas.enableUndo(context)
+
+      for(let i=0; i<numLines; i++){
+        const x1 = Math.random() * width
+        const y1 = Math.random() * height
+        const x2 = Math.random() * width
+        const y2 = Math.random() * height
+        const r = Math.floor(Math.random() * 256)
+        const g = Math.floor(Math.random() * 256)
+        const b = Math.floor(Math.random() * 256)
+        context.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')'
+        context.beginPath()
+        context.moveTo(x1, y1)
+        context.lineTo(x2, y2)
+        context.closePath()
+        context.stroke()
+      }
+
+      const historyNoLabel = document.getElementById('historyNo')  
+      const historySlider = document.getElementById('historySlider')
+      historySlider.min = 0
+      historySlider.max = context.currentHistoryNo
+
+      const updateControls = () => {
+        historyNoLabel.value = context.currentHistoryNo
+        historySlider.value = context.currentHistoryNo
+      }                                                              
+       
+      historySlider.addEventListener('input', () => {
+        context.currentHistoryNo = historySlider.value
+        updateControls()
+      })
+
+                                                                    
+      const undoButton = document.getElementById('undoButton')       
+      undoButton.addEventListener('click', () => {
+        context.undo()
+        updateControls()
+      })
+
+      const redoButton = document.getElementById('redoButton')
+      redoButton.addEventListener('click', () => {
+        context.redo()
+        updateControls()
+      })
+
+      updateControls()
+    })
+  </script>
+</head>
+<body>
+  <div style="width: 300px; padding: 0; margin: 0; text-align: center;">
+    <canvas id="hoge" width="300" height="300"></canvas><br />
+    <button id="undoButton">Undo</button>
+    <input id="historyNo" type="text" disabled style="width: 70px; text-align: right"/>
+    <button id="redoButton">Redo</button><br />
+    <input id="historySlider" type="range" step="1" style="width: 100%;"/>
+  </div>
+</body>
+</html>
