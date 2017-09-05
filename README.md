@@ -34,5 +34,5 @@ npm install --save undo-canvas
 
 ### Browser
 ```
-<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.0/undo-canvas.js"></script>
+<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.2/undo-canvas.js"></script>
 ```
