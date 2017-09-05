@@ -1,0 +1,32 @@
+{
+  "name": "undo-canvas",
+  "version": "0.1.0",
+  "description": "Adds undo/redo functions to CanvasRenderingContext2D",
+  "main": "index.js",
+  "scripts": {
+    "build": "uglifyjs index.js -c | browserify - --standalone UndoCanvas -o undo-canvas.js",
+    "test": "open test.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magicien/undo-canvas.git"
+  },
+  "keywords": [
+    "canvas"
+  ],
+  "author": "magicien",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/magicien/undo-canvas/issues"
+  },
+  "homepage": "https://github.com/magicien/undo-canvas#readme",
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.0",
+    "uglify-es": "^3.0.28"
+  },
+  "dependencies": {
+    "reset-object": "^0.1.1"
+  }
+}
