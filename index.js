@@ -202,6 +202,19 @@ function putTag(name = '') {
   })
 }
 
+function getCurrentHistoryNo() {
+  return this._undodata.current.no
+}
+
+function setCurrentHistoryNo(value) {
+  const step = value - this._undodata.current.no
+  if(step > 0){
+    this.redo(step)
+  }else if(step < 0){
+    this.undo(-step)
+  }
+}
+
 function getLatestCheckpoint(obj, no) {
   const cps = obj._undodata.checkpoints
   for(let i=cps.length-1; i>=0; i--){
@@ -344,6 +357,12 @@ function addUndoProperties(context) {
   context.undoTag = undoTag.bind(context)
   context.redoTag = redoTag.bind(context)
   context.putTag = putTag.bind(context)
+  Object.defineProperty(context, 'currentHistoryNo', {
+    enumerable: true,
+    configurable: true,
+    get: getCurrentHistoryNo.bind(context),
+    set: setCurrentHistoryNo.bind(context)
+  })
 
   const redoLog = new RedoLog([], 0)
   const cp = new CheckPoint(context, redoLog)
