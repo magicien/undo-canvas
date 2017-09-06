@@ -123,6 +123,9 @@ function undo(step = 1) {
   if(step < 1){
     return
   }
+  if(this._undodata.commands.length > 0){
+    commit(this)
+  }
   let redoNo = this._undodata.current.no - step
   if(redoNo < 0){
     redoNo = 0
