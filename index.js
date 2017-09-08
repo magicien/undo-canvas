@@ -234,6 +234,17 @@ function getLatestRedo(obj) {
   return obj._undodata.redos[redoLen - 1]
 }
 
+function recalcCost(obj) {
+  const lastCp = obj._undodata.checkpoints[obj._undodata.checkpoints.length - 1]
+  let redo = lastCp.redo.next
+  let cost = 0
+  while(redo){
+    cost += redo.cost
+    redo = redo.next
+  }
+  obj._undodata.cost = cost
+}
+
 function deleteFutureData(obj) {
   const current = obj._undodata.current
   const currentNo = current.no
@@ -241,9 +252,10 @@ function deleteFutureData(obj) {
   // delete redos
   const latestRedo = getLatestRedo(obj)
   const numRedos = latestRedo.no - current.no
-  if(numRedos){
-    obj._undodata.redos.length = obj._undodata.redos.length - numRedos
+  if(numRedos <= 0){
+    return
   }
+  obj._undodata.redos.length = obj._undodata.redos.length - numRedos
   current.next = null
 
   // delete checkpoints
@@ -265,6 +277,8 @@ function deleteFutureData(obj) {
     }
   }
   tags.length = i + 1
+
+  recalcCost(obj)
 }
 
 function addCommand(obj, command) {
