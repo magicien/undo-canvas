@@ -82,6 +82,20 @@ class CheckPoint {
     this.setContextParameters(context)
     context._undodata.cost = 0
   }
+
+  serialize() {
+    const data = {}
+    data.p = this.parameters
+    data.w = this.imageData.width
+    data.h = this.imageData.height
+    data.d = this.imageData.data
+  }
+
+  deserialize(data) {
+    this.parameters = data.p
+    this.imageData = new ImageData(data.d, data.w, data.h)
+    this.redo = null
+  }
 }
 
 class RedoLog {
@@ -105,6 +119,23 @@ class RedoLog {
     }
     return cost
   }
+
+  serialize(funcs) {
+    const data = []
+    for(const command of this.commands){
+      data.push(command.serialize(funcs))
+    }
+    return data
+  }
+
+  static deserialize(data, no, funcs) {
+    const commands = []
+    for(const d of data){
+      const command = CommandLog.deserialize(d, funcs)
+      commands.push(command)
+    }
+    return new RedoLog(commands, no)
+  }
 }
 
 class CommandLog {
@@ -116,6 +147,25 @@ class CommandLog {
 
   apply(context) {
     this.func.bind(context)(...this.args)
+  }
+
+  serialize(funcs) {
+    let index = funcs.indexOf(this.func)
+    if(index == -1){
+      funcs.push(this.func)
+      index = funcs.length - 1
+    }
+    return {
+      f: index,
+      a: serializeData(args)
+    }
+  }
+
+  static deserialize(data, funcs) {
+    const func = funcs[data.f]
+    const args = deserializeData(data.a)
+    const command = new CommandLog(func, args)
+    return command
   }
 }
 
@@ -214,6 +264,44 @@ function putTag(name = '') {
     }
   }
   tags.push(newData)
+}
+
+function serializeData(obj) {
+}
+
+function deserializeData(data) {
+}
+
+function serialize() {
+  const funcs = []
+  const data = {context: {}, oldest: 0, current: 0, funcs: [], redos: [], tags: []}
+
+  data.context = this._undodata.checkpoints[0].serialize()
+  data.oldest = this._undodata.oldestHistoryNo
+  data.current = this._undodata.currentHistoryNo
+
+  const redos = []
+  for(const redo of this._undodata.redos){
+    redos.push(redo.serialize(funcs))
+  }
+  data.redos = redos
+
+  for(const func of funcs){
+    data.funcs.push(func.name)
+  }
+
+  const tags = []
+  for(const tag of this._undodata.tags){
+    tags.push({
+      n: tag.name,
+      r: tag.no
+    })
+  }
+
+  return data
+}
+
+function deserialize(data) {
 }
 
 function getCurrentHistoryNo() {
@@ -384,6 +472,8 @@ function addUndoProperties(context) {
   context.undoTag = undoTag.bind(context)
   context.redoTag = redoTag.bind(context)
   context.putTag = putTag.bind(context)
+  context.serialize = serialize.bind(context)
+  context.deserialize = deserialize.bind(context)
   Object.defineProperty(context, 'currentHistoryNo', {
     enumerable: true,
     configurable: true,
