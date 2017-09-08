@@ -4,7 +4,7 @@ Add undo/redo functions to CanvasRenderingContext2D
 [Online Demo 1](https://magicien.github.io/undo-canvas/demo.html) / [Demo 2](https://magicien.github.io/undo-canvas/demo2.html)
 
 ```
-<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.2/undo-canvas.js"></script>
+<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.3/undo-canvas.js"></script>
 <script>
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
@@ -34,5 +34,5 @@ npm install --save undo-canvas
 
 ### Browser
 ```
-<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.2/undo-canvas.js"></script>
+<script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.3/undo-canvas.js"></script>
 ```
