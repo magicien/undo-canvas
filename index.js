@@ -168,41 +168,52 @@ function redo(step = 1) {
 
 function undoTag(name = /.*/, step = 1) {
   if(step < 1){
-    return null
+    return
   }
   const current = this._undodata.current
   let tags
   if(name instanceof RegExp){
-    tags = this._undodata.tags.filter(tag => tag.no < current && name.test(tag.name))
+    tags = this._undodata.tags.filter(tag => tag.no < current.no && name.test(tag.name))
   }else{
-    tags = this._undodata.tags.filter(tag => tag.no < current && tag.name == name)
+    tags = this._undodata.tags.filter(tag => tag.no < current.no && tag.name == name)
   }
   let index = tags.length - step
   if(index < 0){
-    return null
+    return
   }
-  return tags[index]
+  this.currentHistoryNo = tags[index].no
 }
 
 function redoTag(name = /.*/, step = 1) {
   if(step < 1){
-    return null
+    return
   }
   const current = this._undodata.current
   let tags
   if(name instanceof RegExp){
-    tags = this._undodata.tags.filter(tag => tag.no > current && name.test(tag.name))
+    tags = this._undodata.tags.filter(tag => tag.no > current.no && name.test(tag.name))
   }else{
-    tags = this._undodata.tags.filter(tag => tag.no > current && tag.name == name)
+    tags = this._undodata.tags.filter(tag => tag.no > current.no && tag.name == name)
   }
-  return tags[step - 1]
+  if(tags.length <= step - 1){
+    return
+  }
+  this.currentHistoryNo = tags[step - 1].no
 }
 
 function putTag(name = '') {
-  this._undodata.tags.push({
-    no: getLatestRedo(this).no,
+  const newData = {
+    no: this.currentHistoryNo,
     name: name
-  })
+  }
+  const tags = this._undodata.tags
+  for(let i=tags.length-1; i>=0; i--){
+    if(tags[i].no <= newData.no){
+      tags.splice(i+1, 0, newData)
+      return
+    }
+  }
+  tags.push(newData)
 }
 
 function getCurrentHistoryNo() {
@@ -294,7 +305,6 @@ function addRedo(obj, redoLog) {
   obj._undodata.cost += redoLog.cost
 
   if(obj._undodata.cost > obj._undodata.cpThreshold){
-    console.log('CheckPoint: cost: ' + obj._undodata.cost)
     const cp = new CheckPoint(obj, redoLog)
     obj._undodata.checkpoints.push(cp)
     obj._undodata.cost = 0
@@ -379,6 +389,16 @@ function addUndoProperties(context) {
     configurable: true,
     get: getCurrentHistoryNo.bind(context),
     set: setCurrentHistoryNo.bind(context)
+  })
+  Object.defineProperty(context, 'oldestHistoryNo', {
+    enumerable: false,
+    configurable: true,
+    get: () => context._undodata.redos[0].no
+  })
+  Object.defineProperty(context, 'newestHistoryNo', {
+    enumerable: false,
+    configurable: true,
+    get: () => context._undodata.redos[context._undodata.redos.length - 1].no
   })
 
   const redoLog = new RedoLog([], 0)

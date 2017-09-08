@@ -1,0 +1,132 @@
+<html>
+<head>
+  <meta charset="utf8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>undo-canvas demo 2</title>
+  <script src="undo-canvas.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const c = document.getElementById('undoCanvas')
+      const context = c.getContext('2d')
+      const width = c.width
+      const height = c.height
+
+      context.lineJoin = 'round'
+      context.lineWidth = 3
+      context.strokeStyle = 'blue'
+
+      UndoCanvas.enableUndo(context)
+
+      const historyNoLabel = document.getElementById('historyNo')  
+      const historySlider = document.getElementById('historySlider')
+      historySlider.min = 0
+      historySlider.max = context.currentHistoryNo
+
+      const updateControls = () => {
+        historyNoLabel.value = context.currentHistoryNo
+        historySlider.max = context.newestHistoryNo
+        historySlider.value = context.currentHistoryNo
+      }                                                              
+       
+      historySlider.addEventListener('input', (e) => {
+        e.preventDefault()
+        context.currentHistoryNo = historySlider.value
+        updateControls()
+      })
+
+                                                                    
+      const undoButton = document.getElementById('undoButton')       
+      undoButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        context.undo()
+        updateControls()
+      })
+
+      const redoButton = document.getElementById('redoButton')
+      redoButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        context.redo()
+        updateControls()
+      })
+
+      const undoTagButton = document.getElementById('undoTagButton')
+      undoTagButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        context.undoTag()
+        updateControls()
+      })
+
+      const redoTagButton = document.getElementById('redoTagButton')
+      redoTagButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        context.redoTag()
+        updateControls()
+      })
+
+
+      let drawing = false
+      let prevMouseX = 0
+      let prevMouseY = 0
+      let connectLine = false
+      const draw = (e) => {
+        const mouseX = e.pageX - c.offsetLeft
+        const mouseY = e.pageY - c.offsetTop
+
+        context.beginPath()
+        if(connectLine){
+          context.moveTo(prevMouseX, prevMouseY)
+        }else{
+          context.moveTo(mouseX, mouseY)
+        }
+        context.lineTo(mouseX, mouseY)
+        context.closePath()
+        context.stroke()
+        prevMouseX = mouseX
+        prevMouseY = mouseY
+        connectLine = true
+        updateControls()
+      }
+
+      c.addEventListener('mousedown', (e) => {
+        e.preventDefault()
+        context.putTag()
+        drawing = true
+        draw(e)
+      })
+
+      c.addEventListener('mousemove', (e) => {
+        if(drawing){
+          e.preventDefault()
+          draw(e)
+        }
+      })
+
+      c.addEventListener('mouseleave', (e) => {
+        connectLine = false
+      })
+
+      document.addEventListener('mouseup', (e) => {
+        if(drawing){
+          context.putTag()
+        }
+        drawing = false
+        connectLine = false
+      })
+
+      updateControls()
+    })
+  </script>
+</head>
+<body>
+  <h2>Undo/Redo Tags Demo</h2>
+  <div style="width: 300px; padding: 0 20px; margin: 0; text-align: center;">
+    <canvas id="undoCanvas" width="300" height="300"></canvas><br />
+    <button id="undoTagButton">Undo Tag</button>
+    <button id="undoButton">Undo</button>
+    <input id="historyNo" type="text" disabled style="width: 40px; text-align: right"/>
+    <button id="redoButton">Redo</button>
+    <button id="redoTagButton">Redo Tag</button><br />
+    <input id="historySlider" type="range" step="1" style="width: 100%;"/>
+  </div>
+</body>
+</html>
