@@ -1,7 +1,7 @@
 # undo-canvas
 Add undo/redo functions to CanvasRenderingContext2D
 
-[Online Demo](https://magicien.github.io/undo-canvas/demo.html)
+[Online Demo 1](https://magicien.github.io/undo-canvas/demo.html) / [Demo 2](https://magicien.github.io/undo-canvas/demo2.html)
 
 ```
 <script src="https://cdn.rawgit.com/magicien/undo-canvas/v0.1.2/undo-canvas.js"></script>
