@@ -68,9 +68,24 @@
       let prevMouseX = 0
       let prevMouseY = 0
       let connectLine = false
+
+      const getMouseX = (e) => {
+        if(typeof e.targetTouches !== 'undefined'){
+          return e.targetTouches[0].pageX - c.offsetLeft
+        }
+        return e.pageX - c.offsetLeft
+      }
+
+      const getMouseY = (e) => {
+        if(typeof e.targetTouches !== 'undefined'){
+          return e.targetTouches[0].pageY - c.offsetTop
+        }
+        return e.pageY - c.offsetTop
+      }
+
       const draw = (e) => {
-        const mouseX = e.pageX - c.offsetLeft
-        const mouseY = e.pageY - c.offsetTop
+        const mouseX = getMouseX(e)
+        const mouseY = getMouseY(e)
 
         context.beginPath()
         if(connectLine){
@@ -106,6 +121,36 @@
       })
 
       document.addEventListener('mouseup', (e) => {
+        if(drawing){
+          context.putTag()
+        }
+        drawing = false
+        connectLine = false
+      })
+
+      c.addEventListener('touchstart', (e) => {
+        e.preventDefault()
+        context.putTag()
+        drawing = true
+        draw(e)
+      })
+
+      c.addEventListener('touchmove', (e) => {
+        if(drawing){
+          e.preventDefault()
+          draw(e)
+        }
+      })
+
+      document.addEventListener('touchend', (e) => {
+        if(drawing){
+          context.putTag()
+        }
+        drawing = false
+        connectLine = false
+      })
+
+      document.addEventListener('touchcancel', (e) => {
         if(drawing){
           context.putTag()
         }
